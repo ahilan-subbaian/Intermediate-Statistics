@@ -1,0 +1,257 @@
+---
+title: "Final Project"
+author: "Ahilan Subbaian"
+date: "5/14/2020"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+I pledge my honor that I have abided by the Stevens Honor System.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+11.53)
+```{r,echo=FALSE}
+library(readxl)
+data <- readxl::read_excel("ex11-53cheese.xls")
+taste <- data$taste
+acetic <- data$acetic
+h2s <- data$h2s
+lactic <- data$lactic
+```
+
+```{r,echo=FALSE}
+tab <- matrix(c(mean(taste), median(taste), sd(taste), IQR(taste), mean(acetic), median(acetic), sd(acetic),
+                IQR(acetic), mean(h2s), median(h2s), sd(h2s), IQR(h2s), mean(lactic), median(lactic),
+                sd(lactic), IQR(lactic)),ncol=4,byrow=TRUE)
+colnames(tab) <- c("Mean","Median","Standard Deviation", "IQR")
+rownames(tab) <- c("Taste","Acetic", "H2s", "Lactic")
+tab <- as.table(tab)
+tab
+```
+
+STEM PLOTS:
+
+Taste
+Slightly skewed to the right
+```{r,echo=FALSE}
+stem(taste)
+```
+
+Acetic
+Uniform distribution
+```{r,echo=FALSE}
+stem(acetic)
+```
+
+H2s
+Right skewed
+```{r,echo=FALSE}
+stem(h2s)
+```
+
+Lactic
+Normally distributed
+```{r,echo=FALSE}
+stem(lactic)
+```
+
+QQ PLOT:
+
+```{r,echo=FALSE}
+par(mfrow=c(2,2))
+qqnorm(taste, pch = 1, frame = FALSE, main = "Taste")
+qqnorm(acetic, pch = 1, frame = FALSE,main = "Acetic")
+qqnorm(h2s, pch = 1, frame = FALSE, main = "H2s")
+qqnorm(lactic, pch = 1, frame = FALSE, main = "Lactic")
+```
+Taste - slightly off the line
+Actic - slightly off the line
+H2s - appearns normal
+Lactic - appearns normal
+11.54)
+
+```{r,echo=FALSE}
+par(mfrow=c(2,3))
+plot(taste, acetic, main = "Acetic vs Taste")
+plot(taste, h2s, main = "Acetic vs Taste")
+plot(taste, lactic, main = "Lactic vs Taste")
+plot(acetic, h2s, main = "H2s vs Acetic")
+plot(acetic, lactic, main = "Lactic vs Acetic")
+plot(h2s, lactic, main = "Lactic vs H2s")
+```
+
+```{r,echo=FALSE}
+tab <- matrix(c(cor(taste, acetic), (cor(taste, acetic)*(sqrt(30-2))) / (sqrt(1-(cor(taste, acetic)^2))), 2 - 2*pt((cor(taste, acetic)*(sqrt(30-2))) / (sqrt(1-(cor(taste, acetic)^2))), df = 28), 
+                cor(taste,h2s),(cor(taste,h2s)*(sqrt(30-2))) / (sqrt(1-(cor(taste,h2s)^2))), 2 - 2*pt((cor(taste,h2s)*(sqrt(30-2))) / (sqrt(1-(cor(taste,h2s)^2))), df = 28), 
+                cor(taste, lactic), (cor(taste, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(taste, lactic)^2))), 2 - 2*pt((cor(taste, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(taste, lactic)^2))), df = 28), 
+                cor(acetic, h2s), (cor(acetic, h2s)*(sqrt(30-2))) / (sqrt(1-(cor(acetic, h2s)^2))), 2 - 2*pt((cor(acetic, h2s)*(sqrt(30-2))) / (sqrt(1-(cor(acetic, h2s)^2))), df = 28), 
+                cor(acetic, lactic), (cor(acetic, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(acetic, lactic)^2))), 2 - 2*pt((cor(acetic, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(acetic, lactic)^2))), df = 28), 
+                cor(h2s, lactic), (cor(h2s, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(h2s, lactic)^2))), 2 - 2*pt((cor(h2s, lactic)*(sqrt(30-2))) / (sqrt(1-(cor(h2s, lactic)^2))), df = 28)
+                ), ncol=3,byrow=TRUE)
+colnames(tab) <- c("Correlation", "T-Statistic", "P-Value")
+rownames(tab) <- c("Acetic vs Taste", "Acetic vs Taste", "Lactic vs Taste", "H2s vs Acetic", "Lactic vs Acetic", "Lactic vs H2s")
+MyList <- list("Moderately Strong Positively", "Strong Postively", "Strong Postively", "Moderately Strong Positively", "Moderately Strong Positively", "Moderately Strong Positively") # was not able to put in table
+tab <- as.table(tab)
+tab
+```
+The correlations can be described as Moderately Strong Positively, Strong Postively, Strong Postively, Moderately Strong Positively, Moderately Strong Positively and Moderately Strong Positively respectively
+
+H_0: rho = 0
+H_a: rho != 0
+rho = population correlation coefficient
+DF = 30 - 2 = 28
+
+Because all p-values are less than alpha which is .05, we can reject the null hypothesis with
+significant evidence that there exists a linear correlation between each of the two variables.
+
+
+11.55)
+
+```{r,echo=FALSE}
+summary(lm(taste ~ acetic))
+```
+
+The coefficient of determination is .302 which means 30% of the change in taste can be explained by acetic. For every increase in acetic by 1 the taste value increases by 15.6. 
+
+```{r,echo=FALSE}
+fit <- lm(taste ~ acetic)
+plot(acetic, taste, main = "Acetic vs Taste")
+abline(fit)
+```
+
+The residuals in both cases seem normally distributed and are positively associated with H2S and Lactic.
+
+```{r,echo=FALSE}
+par(mfrow=c(1,2))
+residuals <- resid(lm(taste ~ acetic))
+#plot(acetic, taste, main = "Scatterplot of Acetic vs Taste")
+plot(h2s, residuals, main = "H2s vs. Residuals")
+plot(lactic, residuals, main = "Lactic vs. Residuals")
+```
+
+11.56)
+```{r,echo=FALSE}
+summary(lm(taste ~ h2s))
+```
+
+The coefficient of determination is .571 which means 57.1% of the change in taste can be explained by h2s. For every increase in h2s by 1 the taste value increases by 5.77. 
+
+```{r,echo=FALSE}
+fit <- lm(taste ~ h2s)
+plot(h2s, taste, main = "H2s vs Taste")
+abline(fit)
+```
+
+The residuals in both cases seem normally distributed as the residuals are randomly plotted and are slightly positively associated with Acetic and a little more positively associated with Lactic as seen through the line of best fit.
+
+```{r,echo=FALSE}
+par(mfrow=c(1,2))
+residuals <- resid(lm(taste ~ h2s))
+fit <- lm(residuals ~ acetic)
+fit1 <- lm(residuals ~ lactic)
+#plot(acetic, taste, main = "Scatterplot of Acetic vs Taste")
+plot(acetic, residuals, main = "Acetic vs. Residuals")
+abline(fit)
+plot(lactic, residuals, main = "Lactic vs. Residuals")
+abline(fit1)
+```
+
+
+11.57)
+
+```{r,echo=FALSE}
+summary(lm(taste ~ lactic))
+```
+
+The coefficient of determination is .496 which means 49.6% of the change in taste can be explained by lactic. For every increase in lactic by 1 the taste value increases by 37.7. 
+
+```{r,echo=FALSE}
+fit <- lm(taste ~ lactic)
+plot(lactic, taste, main = "Lactic vs Taste")
+abline(fit)
+```
+
+The residuals in both cases seem normally distribute as the residuals are randomly plotted and are slightly positively associated with Acetic and a little more positively associated with h2s as seen through the line of best fit.
+
+```{r,echo=FALSE}
+par(mfrow=c(1,2))
+residuals <- resid(lm(taste ~ lactic))
+fit <- lm(residuals ~ acetic)
+fit1 <- lm(residuals ~ h2s)
+#plot(acetic, taste, main = "Scatterplot of Acetic vs Taste")
+plot(acetic, residuals, main = "Acetic vs. Residuals")
+abline(fit)
+plot(h2s, residuals, main = "H2s vs. Residuals")
+abline(fit1)
+```
+
+11.58) 
+
+```{r,echo=FALSE}
+lac <- summary(lm(taste ~ lactic))
+ace <- summary(lm(taste ~ acetic))
+h <- summary(lm(taste ~ h2s))
+
+vals <- matrix(c(lac$fstatistic[1],lac$r.squared[1],lac$sigma,1.405e-05,ace$fstatistic[1],ace$r.squared[1],ace$sigma,0.001568,h$fstatistic[1],h$r.squared[1],h$sigma,1.374e-06), ncol=4, byrow = TRUE)
+
+colnames(vals) <- c("F-statistic","R^2", "Standard Dev","P-value")
+rownames(vals) <- c("Lactic","Acetic","H2S")
+vals <- as.table(vals)
+vals
+```
+
+```{r,echo=FALSE}
+c_lac <- coefficients(lac)
+c_ace <- coefficients(ace)
+c_h <- coefficients(h)
+#c_lac
+#c_ace
+#c_h
+```
+Lactic -  y = 37.72x - 29.86
+
+Acetic - y = 16.65x - 61.499
+
+H2S - y = 5.78x - 9.79
+
+For each of the regression equations the y-intercepts are negative and can be ignored as a negative value has no context. This occurs because there has to be a minimum value of each of the three elements in cheese, which is obtained from the x-intercept of each equation.
+
+11.59)
+
+```{r,echo=FALSE}
+ah_model <- summary((lm(taste ~ acetic+h2s)))
+ah_model
+#cor(acetic,h2s)
+```
+
+The coefficient of determination is .582 which means 58.2% of the change in taste can be explained by acetic and h2s. For every increase in acetic by 1 the taste value increases by 3.8. For every increase in h2s by 1 the taste value increases by 5.14. Acetic in this model does not really help that much in predicting the taste with h2s as acetic is already correlated with the h2s 61.796%. So this model isn't much better than the alternative that was asked to compare.
+
+Taste ~ 26.94 + 3.801 * acetic + 5.15 * h2s
+
+11.60)
+
+```{r,echo=FALSE}
+hl_model <- summary((lm(taste ~ lactic+h2s)))
+hl_model
+#mean(hl_model$residuals) <- used to calculate the residual average to see how off this model was
+```
+
+The coefficient of determination is .651 which means 65.1% of the change in taste can be explained by lactic and h2s. For every increase in lactic by 1 the taste value increases by 19.8. For every increase in h2s by 1 the taste value increases by 3.94. We get a more accurate predictive model when taking into account of two predictors rather than just using 1, because the taste value definitely relies on both. This is seen through an improvement residual value as the residual average, or error average is very close to zero at -4.996004e-16.
+
+Taste ~ 27.592 + 19.887 * acetic + 3.946 * h2s.
+
+11.61)
+
+```{r,echo=FALSE}
+finalmodel <- summary((lm(taste ~ (acetic+h2s+lactic))))
+finalmodel
+#mean(finalmodel$residuals)
+```
+
+The coefficient of determination is .651 which means 65.1% of the change in taste can be explained by lactic and h2s and acetic. For every increase in lactic by 1 the taste value increases by 19.7. For every increase in h2s by 1 the taste value increases by 3.91. For every increase in acetic by 1 the taste value increases by .0327. I believe this model is a better predictor of taste. The metrics are near similar. Even though the coefficient for acetic is near 0, we previously showed that taste is correlated to acetic, meaning there is significant evidence that taste is affected by the acetic value.
+
+Taste ~ 28.877 + 0.3277 * acetic + 3.9118 * h2s + 19.6705 * lactic.
